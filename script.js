@@ -447,6 +447,51 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==================== DOWNLOAD RESUME ====================
   // Handled natively via the 'download' attribute in HTML.
 
+  // ==================== CONTACT FORM AJAX SUBMISSION ====================
+  const contactForm = document.getElementById('contact-form');
+  const formStatus = document.getElementById('form-status');
+
+  if (contactForm && formStatus) {
+    contactForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const submitBtn = contactForm.querySelector('.btn-submit');
+      const originalBtnContent = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i data-lucide="loader-2" class="spin"></i><span>Sending...</span>';
+      
+      const formData = new FormData(contactForm);
+      
+      fetch(contactForm.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'Accept': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        formStatus.className = 'form-status success show';
+        formStatus.innerHTML = 'Thank you! Your message has been sent successfully.';
+        contactForm.reset();
+      })
+      .catch(error => {
+        formStatus.className = 'form-status error show';
+        formStatus.innerHTML = 'Oops! There was a problem submitting your form.';
+      })
+      .finally(() => {
+        submitBtn.innerHTML = originalBtnContent;
+        if (typeof lucide !== 'undefined') {
+          lucide.createIcons();
+        }
+        
+        // Hide status message after 5 seconds
+        setTimeout(() => {
+          formStatus.classList.remove('show');
+        }, 5000);
+      });
+    });
+  }
+
   // ==================== LAZY LOADING IMAGES ====================
   if ('IntersectionObserver' in window) {
     const lazyImages = document.querySelectorAll('img[loading="lazy"]');
