@@ -168,7 +168,9 @@ img { max-width: 100%; display: block; }
 .intro-logo-img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
+  border-radius: 50%;
+  background: transparent;
   filter: drop-shadow(0 0 25px rgba(245, 158, 11, 0.3)); /* Premium gold glow */
 }
 
@@ -185,13 +187,8 @@ img { max-width: 100%; display: block; }
   transition: transform 1.8s cubic-bezier(0.77, 0, 0.175, 1);
 }
 
-.intro-container.split .logo-half-left {
-  transform: translateX(-220px);
-}
-
-.intro-container.split .logo-half-right {
-  transform: translateX(220px);
-}
+/* Dynamic split distance applied via JS, remove hardcoded CSS classes */
+/* .intro-container.split .logo-half-left and .intro-container.split .logo-half-right removed */
 
 .intro-name-container {
   position: absolute;
@@ -205,9 +202,9 @@ img { max-width: 100%; display: block; }
 
 .intro-name {
   font-family: var(--font-display);
-  font-size: 38px;
+  font-size: clamp(20px, 3vw, 38px);
   font-weight: 800;
-  letter-spacing: 6px;
+  letter-spacing: clamp(2px, 0.5vw, 6px);
   color: #FFFFFF;
   text-transform: uppercase;
   display: flex;
@@ -217,21 +214,49 @@ img { max-width: 100%; display: block; }
 
 .intro-letter {
   opacity: 0;
-  transform: translateY(30px) scale(0.8);
+  transform: translateY(30px);
   /* White and blue cinematic glow */
-  text-shadow: 0 0 15px rgba(255, 255, 255, 0.9), 0 0 30px rgba(6, 182, 212, 0.8), 0 0 45px rgba(99, 102, 241, 0.6);
+  color: rgba(255, 255, 255, 0.7);
   transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-  will-change: transform, opacity;
+  will-change: transform, opacity, filter, text-shadow;
+  display: inline-block;
 }
 
 .intro-letter.revealed {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateY(0);
 }
 
 /* Space characters */
 .intro-letter:empty {
   width: 15px;
+}
+
+/* Electric pulse animation */
+.intro-letter.electric-pulse {
+  animation: electricPulse 0.5s ease-out forwards;
+}
+
+@keyframes electricPulse {
+  0% {
+    text-shadow: 0 0 2px rgba(200, 230, 255, 0.4);
+    color: rgba(255, 255, 255, 0.7);
+  }
+  20% {
+    text-shadow: 0 0 4px rgba(255, 255, 255, 0.8), 
+                 0 0 10px rgba(50, 150, 255, 0.8),
+                 0 0 15px rgba(0, 100, 255, 0.5);
+    color: #ffffff;
+  }
+  40% {
+    text-shadow: 0 0 2px rgba(255, 255, 255, 0.5), 
+                 0 0 8px rgba(50, 150, 255, 0.6);
+    color: #f0f8ff;
+  }
+  100% {
+    text-shadow: 0 0 1px rgba(50, 150, 255, 0.2);
+    color: #ffffff;
+  }
 }
 
 .intro-name.fade-out {
@@ -334,6 +359,7 @@ img { max-width: 100%; display: block; }
   width: 40px;
   border-radius: 50%;
   object-fit: cover;
+  background: transparent;
   box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.3);
   transition: transform var(--transition);
 }

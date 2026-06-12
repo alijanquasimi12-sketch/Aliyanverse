@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fullName.split('').forEach(char => {
     const span = document.createElement('span');
     span.className = 'intro-letter';
-    span.textContent = char === ' ' ? '' : char;
+    span.textContent = char === ' ' ? '\u00A0' : char; // Non-breaking space
     nameContainer.appendChild(span);
   });
 
@@ -35,22 +35,41 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Initial fade in of the unbroken logo
     if (logoWrapper) logoWrapper.classList.add('fade-in');
     
+    // Calculate required split distance dynamically
+    const requiredWidth = nameContainer.offsetWidth || 800; // Fallback if 0
+    const padding = 80; // Extra padding so text never touches logo
+    const splitDistance = (requiredWidth / 2) + padding;
+    
+    const logoHalfLeft = document.querySelector('.logo-half-left');
+    const logoHalfRight = document.querySelector('.logo-half-right');
+
     // 2. Pause, then Split the logo
     setTimeout(() => {
-      if (introContainer) introContainer.classList.add('split');
+      // Manually set dynamic transform instead of using .split class
+      if (logoHalfLeft) logoHalfLeft.style.transform = `translateX(-${splitDistance}px)`;
+      if (logoHalfRight) logoHalfRight.style.transform = `translateX(${splitDistance}px)`;
       
-      // 3. While splitting, reveal the name letter by letter
+      // 3. Wait for logo split to complete entirely (1.8s) before starting text reveal
       setTimeout(() => {
-        letters.forEach((letter, index) => {
+        let nameRevealDelay = 0;
+        letters.forEach((letter) => {
           setTimeout(() => {
             letter.classList.add('revealed');
-          }, index * 40); // 40ms stagger for premium feel
+            letter.classList.add('electric-pulse');
+          }, nameRevealDelay);
+          nameRevealDelay += 85; // 85ms between letters for smooth premium feel
         });
         
-        // 4. Pause to read the name, then reconstruct
+        // Time when the last letter finishes pulsing
+        const totalRevealTime = nameRevealDelay + 500; 
+        
+        // 4. Hold for 1 second after full name is revealed
         setTimeout(() => {
-          if (introContainer) introContainer.classList.remove('split');
           if (nameContainer) nameContainer.classList.add('fade-out');
+          
+          // Move logo halves back together ONLY AFTER full name was visible
+          if (logoHalfLeft) logoHalfLeft.style.transform = `translateX(0px)`;
+          if (logoHalfRight) logoHalfRight.style.transform = `translateX(0px)`;
           
           // 5. Final zoom out and fade
           setTimeout(() => {
@@ -66,13 +85,13 @@ document.addEventListener('DOMContentLoaded', () => {
               }, 1000);
             }, 800);
             
-          }, 1500); // Wait for logo to reconstruct
+          }, 1800); // Wait for logo to reconstruct (1.8s)
           
-        }, 2000); // Hold the full composition
+        }, totalRevealTime + 1000); // Hold for 1 second after text finishes
         
-      }, 600); // Start name reveal slightly after split starts
+      }, 1800); // Wait for the 1.8s logo split transition to finish completely
       
-    }, 1500); // Hold unbroken logo
+    }, 1500); // Hold unbroken logo initially
     
   }, 100); // Short initial delay
 
@@ -426,13 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==================== DOWNLOAD RESUME ====================
-  const downloadBtn = document.getElementById('download-resume');
-  if (downloadBtn) {
-    downloadBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      alert('Resume download will be available soon!');
-    });
-  }
+  // Handled natively via the 'download' attribute in HTML.
 
   // ==================== LAZY LOADING IMAGES ====================
   if ('IntersectionObserver' in window) {
