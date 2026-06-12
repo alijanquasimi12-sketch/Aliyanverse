@@ -461,14 +461,22 @@ document.addEventListener('DOMContentLoaded', () => {
       
       const formData = new FormData(contactForm);
       
-      fetch(contactForm.action, {
+      // FormSubmit requires the /ajax/ endpoint for fetch API requests
+      const ajaxUrl = contactForm.action.replace('formsubmit.co/', 'formsubmit.co/ajax/');
+      
+      fetch(ajaxUrl, {
         method: 'POST',
         body: formData,
         headers: {
             'Accept': 'application/json'
         }
       })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
       .then(data => {
         formStatus.className = 'form-status success show';
         formStatus.innerHTML = 'Thank you! Your message has been sent successfully.';
